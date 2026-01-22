@@ -1,0 +1,67 @@
+---
+import Hero from '../components/hero.astro';
+import Layout from '../layouts/layout.astro';
+---
+
+<Layout>
+  <section class="space-y-8">
+		<Hero
+      title="Blog"
+      description="Stuff I write about my experiences and learnings."
+    />
+
+    
+    <p>Still working on it bro... I'll keep you posted.</p>
+  </section>
+</Layout>
+
+<script is:inline>
+  (function () {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const items = document.querySelectorAll(".reveal");
+
+    if (reduceMotion) {
+      items.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    items.forEach((el) => io.observe(el));
+  })();
+</script>
+
+<style>
+  .reveal {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 500ms ease,
+      transform 500ms ease;
+    transition-delay: var(--delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
