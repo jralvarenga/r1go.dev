@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@import 'tw-animate-css';
+@import '@fontsource/geist-sans';
+@import '@fontsource/geist-mono';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #f7ecd5;
+  --foreground: #242424;
+  --card: #f0e6d2;
+  --card-foreground: #242424;
+  --popover: #f7ecd5;
+  --popover-foreground: #242424;
+  --primary: #242424;
+  --primary-foreground: #f7ecd5;
+  --secondary-foreground: #242424;
+  --muted: #e8dccf;
+  --muted-foreground: #666666;
+  --accent-foreground: #f7ecd5;
+  --border: #e8dccf;
+  --input: #f0e6d2;
+}
+
+.dark {
+  --background: #242424;
+  --foreground: #f7ecd5;
+  --card: #2d2d2d;
+  --card-foreground: #f7ecd5;
+  --popover: #2a2a2a;
+  --popover-foreground: #f7ecd5;
+  --primary: #f7ecd5;
+  --primary-foreground: #242424;
+  --secondary-foreground: #f7ecd5;
+  --muted: #404040;
+  --muted-foreground: #999999;
+  --accent-foreground: #f7ecd5;
+  --border: #3a3a3a;
+  --input: #323232;
+}
+
+@theme inline {
+  --font-sans: 'Geist Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', 'Courier New', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
