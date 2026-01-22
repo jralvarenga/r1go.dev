@@ -9,6 +9,8 @@ The goal of this project is to experiment with:
 
 The site is intentionally minimal and serves as a playground for testing ideas around visibility, speed, and user experience.
 
+I took inspiration from **Lee Robinson’s personal website**, particularly in its simplicity and content-first approach.
+
 ## Tech Stack
 - Astro
 
