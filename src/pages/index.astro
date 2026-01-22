@@ -1,10 +1,47 @@
 ---
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Hero from '../components/hero.astro';
+import Layout from '../layouts/layout.astro';
+import SocialLinks from '../components/social-links.astro';
 ---
 
 <Layout>
-	xd
+	<section class="w-full max-w-2xl text-center space-y-8 text-left">
+		<Hero />
+
+		<div class="space-y-6 text-left">
+			<p class="text-base leading-relaxed text-foreground">
+				I build tools and apps to solve problems I run into.
+				When something I build results to be good enough,
+				I share it with everyone so others can use it too and hopefully find it helpful in their own work or daily life.
+			</p>
+
+			<p class="text-base leading-relaxed text-foreground">
+				With 5+ years of experience in frontend and backend development
+				<a href="/projects" class="text-accent underline transition-colors">
+					I build software that solve real problems
+				</a>.
+				I focus on beautiful UX, performance, and building things that feel fast and reliable. 
+				I'm currently working at
+				<a
+					href="https://www.cabanenergy.com"
+					target="_blank"
+					class="text-accent underline transition-colors"
+				>
+					Caban Energy
+				</a>
+				as a Frontend Engineer doing webapps with React, Next.js, Tailwind and TypeScript.
+			</p>
+
+			<p class="text-base leading-relaxed text-foreground">
+				When I'm not coding, you'll exploring new technologies, going to the gym, or playing video games or outdoors.
+				You can see what
+				<a href="/projects" class="text-accent underline transition-colors">I have built</a>.
+				Check what 
+				<a href="/blog" class="text-accent underline transition-colors">I have written about my experiences and learnings</a>
+				or you can contact me via email or any social.
+			</p>
+
+			<SocialLinks />
+		</div>
+	</section>
 </Layout>

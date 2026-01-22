@@ -1,5 +1,6 @@
 ---
 import Header from "../components/header.astro";
+import Footer from "../components/footer.astro";
 import "../styles/global.css";
 ---
 
@@ -27,8 +28,9 @@ import "../styles/global.css";
 	</head>
 	<body class={`font-sans antialiased`}>
 		<Header />
-		<main class="mx-auto max-w-2xl px-6 py-10">
+		<main class="mx-auto max-w-2xl px-6 mt-24">
 			<slot />
 		</main>
+		<Footer />
 	</body>
 </html>
