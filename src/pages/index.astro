@@ -1,53 +1,74 @@
 ---
-import Hero from "../components/hero.astro";
 import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/social-links.astro";
+import SectionHeader from "../components/section-header.astro";
+import ProjectCard from "../components/project-card.astro";
+import PostCard from "../components/post-card.astro";
+import RevealList from "../components/reveal-list.astro";
+
+import { projects } from "../lib/projects";
+import { posts } from "../lib/posts";
+import Hero from "../components/hero.astro";
 ---
 
 <Layout>
-  <section class="w-full max-w-2xl text-center space-y-8 text-left">
-    <Hero
-      title="Jorge Alvarenga"
-      description="Full-stack developer & creative builder"
-    />
+  <div class="space-y-8">
+    <!-- Hero Section -->
+    <section class="space-y-4">
+      <Hero title="Jorge Alvarenga" description="Full-Stack & Product Developer building tools that solve real problems." />
 
-    <div class="space-y-6 text-left">
+      <SectionHeader title="" href="/about-me" linkText="Read more" />
       <p class="text-base leading-relaxed text-foreground">
-        I build tools and apps to solve problems I run into. When something I
-        build results to be good enough, I share it with everyone so others can
-        use it too and hopefully find it helpful in their own work or daily
-        life.
+        I build stuff that I need and if it good enough, I share it with
+        everyone. With 5+ years of experience in frontend and backend
+        development working with a variety of technologies and frameworks. I
+        focus on building performant and beautiful user experiences.
       </p>
-
-      <p class="text-base leading-relaxed text-foreground">
-        I have 5+ years of experience in frontend and backend development
-        working with a variety of technologies and frameworks. I focus on
-        building performant and beautiful user experiences, I enjoy building
-        things that feel fast and reliable. I'm currently working at
+      <p>
+        Currently working at
         <a
           href="https://www.cabanenergy.com"
           target="_blank"
-          class="text-accent underline transition-colors"
-        >
-          Caban Energy
-        </a>
-        as a Frontend Engineer where my stack is React, Next.js, Tailwind and TypeScript.
+          class="underline decoration-muted-foreground/50 underline-offset-2 hover:decoration-foreground transition-colors"
+          >Caban Energy</a
+        > working with React, Next.js, and TypeScript.
       </p>
+    </section>
 
-      <p class="text-base leading-relaxed text-foreground">
-        When I'm not coding, you'll find me exploring new technologies, going to
-        the gym, playing video games or doing something outdoors. You can check <a
-          href="/projects"
-          class="text-accent underline transition-colors"
-          >the projects I've built</a
-        >. See what
-        <a href="/blog" class="text-accent underline transition-colors"
-          >I have written about my experiences and learnings</a
-        >
-        or you can contact me in any social or via email.
-      </p>
-
+    <!-- Connect Section -->
+    <section class="pt-2">
       <SocialLinks />
-    </div>
-  </section>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="space-y-2">
+      <SectionHeader title="Projects" href="/projects" linkText="Check my projects" />
+      <RevealList>
+        {
+          projects.slice(0, 2).map((project, idx) => (
+            <li class="reveal" style={`--delay: ${idx * 70}ms`}>
+              <ProjectCard project={project} variant="compact" />
+            </li>
+          ))
+        }
+      </RevealList>
+    </section>
+
+    <!-- Writing Section -->
+    <section class="space-y-2">
+      <SectionHeader title="Posts" href="/blog" linkText="See my posts" />
+      <RevealList>
+        {
+          posts.slice(0, 2).map((post, idx) => (
+            <li
+              class="reveal"
+              style={`--delay: ${(projects.length + idx) * 70}ms`}
+            >
+              <PostCard post={post} variant="compact" />
+            </li>
+          ))
+        }
+      </RevealList>
+    </section>
+  </div>
 </Layout>
