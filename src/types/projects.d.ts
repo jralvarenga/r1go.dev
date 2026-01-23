@@ -4,4 +4,4 @@ export type Project = {
   tech: string[];
   href: string;
   github?: string;
-}
+};
