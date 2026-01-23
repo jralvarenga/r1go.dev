@@ -1,23 +1,27 @@
 ---
-import Hero from '../components/hero.astro';
-import Layout from '../layouts/Layout.astro';
+import Hero from "../components/hero.astro";
+import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout>
+<Layout
+  title="Blog"
+  description="Writing about my experiences, learnings, and experiments building products."
+>
   <section class="space-y-8">
-		<Hero
+    <Hero
       title="Blog"
       description="Stuff I write about my experiences and learnings."
     />
 
-    
     <p>Still working on it bro... I'll keep you posted.</p>
   </section>
 </Layout>
 
 <script is:inline>
   (function () {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const items = document.querySelectorAll(".reveal");
 
     if (reduceMotion) {
@@ -34,7 +38,7 @@ import Layout from '../layouts/Layout.astro';
           }
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
 
     items.forEach((el) => io.observe(el));

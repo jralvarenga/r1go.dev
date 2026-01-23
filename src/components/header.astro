@@ -1,22 +1,33 @@
 ---
-import { Image } from 'astro:assets'
-import logo from '../assets/profile-pic.jpeg'
+import { Image } from "astro:assets";
+import logo from "../assets/profile-pic.jpeg";
 ---
 
-<header class="rounded-b-xl backdrop-blur-lg bg-background/50 fixed top-0 left-0 right-0 z-50">
+<header
+  class="rounded-b-xl backdrop-blur-lg bg-background/50 fixed top-0 left-0 right-0 z-50"
+>
   <nav class="mx-auto max-w-2xl px-6 py-4 pb-2 sm:py-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <Image src={logo} alt="r1go.dev" class="w-8 h-8 rounded-full" />
-      <a href="/" class="text-lg font-semibold hover:text-accent transition-colors">
-        r1go.dev
-      </a>
+        <a
+          href="/"
+          class="text-lg font-semibold hover:text-accent transition-colors"
+        >
+          r1go.dev
+        </a>
       </div>
       <div class="flex gap-6 items-center text-sm">
-        <a href="/projects" class="text-muted-foreground hover:text-foreground transition-colors">
+        <a
+          href="/projects"
+          class="text-muted-foreground hover:text-foreground transition-colors"
+        >
           Projects
         </a>
-        <a href="/blog" class="text-muted-foreground hover:text-foreground transition-colors">
+        <a
+          href="/blog"
+          class="text-muted-foreground hover:text-foreground transition-colors"
+        >
           Blog
         </a>
         <button
@@ -24,11 +35,26 @@ import logo from '../assets/profile-pic.jpeg'
           class="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
           aria-label="Toggle theme"
         >
-          <svg id="theme-icon-moon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+          <svg
+            id="theme-icon-moon"
+            class="w-5 h-5 hidden"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+            ></path>
           </svg>
-          <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1h0zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.536l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zm5.657-9.193a1 1 0 00-1.414 0l-.707.707A1 1 0 005.05 6.464l.707-.707a1 1 0 011.414-1.414zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" clip-rule="evenodd" />
+          <svg
+            id="theme-icon-sun"
+            class="w-5 h-5 hidden"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1h0zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.536l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zm5.657-9.193a1 1 0 00-1.414 0l-.707.707A1 1 0 005.05 6.464l.707-.707a1 1 0 011.414-1.414zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z"
+              clip-rule="evenodd"></path>
           </svg>
         </button>
       </div>
@@ -39,44 +65,47 @@ import logo from '../assets/profile-pic.jpeg'
 <script>
   // Initialize theme on page load
   function initTheme() {
-    const theme = localStorage.getItem('theme') || 
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+    const theme =
+      localStorage.getItem("theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
+
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
-    
+
     updateThemeIcon(theme);
   }
 
   // Update theme icon based on current theme
   function updateThemeIcon(theme: string) {
-    const moonIcon = document.getElementById('theme-icon-moon');
-    const sunIcon = document.getElementById('theme-icon-sun');
-    
-    if (theme === 'dark') {
-      if (moonIcon) moonIcon.classList.add('hidden');
-      if (sunIcon) sunIcon.classList.remove('hidden');
+    const moonIcon = document.getElementById("theme-icon-moon");
+    const sunIcon = document.getElementById("theme-icon-sun");
+
+    if (theme === "dark") {
+      if (moonIcon) moonIcon.classList.add("hidden");
+      if (sunIcon) sunIcon.classList.remove("hidden");
     } else {
-      if (sunIcon) sunIcon.classList.add('hidden');
-      if (moonIcon) moonIcon.classList.remove('hidden');
+      if (sunIcon) sunIcon.classList.add("hidden");
+      if (moonIcon) moonIcon.classList.remove("hidden");
     }
   }
 
   // Toggle theme
   function toggleTheme() {
-    const isDark = document.documentElement.classList.contains('dark');
-    const newTheme = isDark ? 'light' : 'dark';
-    
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
+    const isDark = document.documentElement.classList.contains("dark");
+    const newTheme = isDark ? "light" : "dark";
+
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
-    
-    localStorage.setItem('theme', newTheme);
+
+    localStorage.setItem("theme", newTheme);
     updateThemeIcon(newTheme);
   }
 
@@ -84,10 +113,10 @@ import logo from '../assets/profile-pic.jpeg'
   initTheme();
 
   // Set up toggle button
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggleButton = document.getElementById('theme-toggle');
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleButton = document.getElementById("theme-toggle");
     if (toggleButton) {
-      toggleButton.addEventListener('click', toggleTheme);
+      toggleButton.addEventListener("click", toggleTheme);
     }
   });
 </script>

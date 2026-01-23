@@ -2,38 +2,66 @@
 import Header from "../components/header.astro";
 import Footer from "../components/footer.astro";
 import "../styles/global.css";
+
+type LayoutProps = {
+  title?: string;
+  description?: string;
+};
+
+const { title, description } = Astro.props as LayoutProps;
+
+const siteName = "r1go.dev";
+const defaultTitle = "r1go.dev - Jorge Alvarenga";
+const fullTitle = title ? `${title} | ${siteName}` : defaultTitle;
+const metaDescription =
+  description ??
+  "Full-stack developer building fast, polished web experiences. Projects, writing, and experiments.";
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-		<link rel="shortcut icon" href="/favicon.ico" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<meta name="generator" content={Astro.generator} />
-		<title>r1go.dev - Jorge Alvarenga</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={metaDescription} />
 
-		<script is:inline>
-			// Prevent flash of wrong theme by setting it immediately
-			(function() {
-				const theme = localStorage.getItem('theme') || 
-					(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-				if (theme === 'dark') {
-					document.documentElement.classList.add('dark');
-				}
-			})();
-		</script>
+    <link rel="canonical" href={Astro.url} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.toString()} />
 
-	</head>
-	<body class={`font-sans antialiased`}>
-		<Header />
-		<main class="mx-auto max-w-2xl px-6 mt-24">
-			<slot />
-		</main>
-		<Footer />
-	</body>
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+
+    <script is:inline>
+      // Prevent flash of wrong theme by setting it immediately
+      (function () {
+        const theme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+  </head>
+  <body class={`font-sans antialiased`}>
+    <Header />
+    <main class="mx-auto max-w-2xl px-6 mt-24 mb-12">
+      <slot />
+    </main>
+    <Footer />
+  </body>
 </html>
