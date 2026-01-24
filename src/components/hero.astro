@@ -2,12 +2,24 @@
 type HeroProps = {
   title: string;
   description: string;
+  goBack?: boolean;
 };
 
-const { title, description } = Astro.props as HeroProps;
+const { title, description, goBack = false } = Astro.props as HeroProps;
 ---
 
 <div class="space-y-3">
+
+  {
+    goBack && (
+      <a href=".." class="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group">
+        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        Go back
+      </a>
+    )
+  }
   <h1 class="text-2xl font-bold text-balance">
     {title}
   </h1>
