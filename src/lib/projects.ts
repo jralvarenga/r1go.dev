@@ -2,7 +2,7 @@ export const projects = [
   {
     title: "Budio",
     description: "Budget planner and expense tracker for web and mobile.",
-    tech: ["Next.js", "Convex", "TypeScript"],
+    tech: ["Next.js", "Convex", "TypeScript", 'Polar'],
     href: "https://budio.r1go.dev",
   },
   {

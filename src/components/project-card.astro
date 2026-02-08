@@ -43,8 +43,13 @@ const isCompact = variant === "compact";
           <div class="flex items-baseline gap-1.5 flex-wrap">
             <h3 class="text-sm font-medium text-foreground">{project.title}</h3>
             <div class="flex items-center gap-1">
-              {project.tech.slice(0, 2).map((tech) => (
-                <span class="text-[10px] text-muted-foreground/80">{tech}</span>
+              {project.tech.map((tech, i) => (
+                <>
+                  {i > 0 && (
+                    <span class="text-base text-muted-foreground/80">·</span>
+                  )}
+                  <span class="text-[10px] text-muted-foreground/80">{tech}</span>
+                </>
               ))}
             </div>
           </div>

@@ -1,12 +1,11 @@
 ---
-import Hero from "../components/hero.astro";
-import Layout from "../layouts/Layout.astro";
-import PostCard from "../components/post-card.astro";
-import RevealList from "../components/reveal-list.astro";
-import type { Post } from "../types/posts";
-// import { posts } from "../lib/posts";
+import Hero from "../../components/hero.astro";
+import Layout from "../../layouts/Layout.astro";
+import PostCard from "../../components/post-card.astro";
+import RevealList from "../../components/reveal-list.astro";
+import { postSummaries } from "../../lib/posts";
 
-const posts: Post[] = [];
+const posts = postSummaries.filter((post) => !post.isArchived);
 ---
 
 <Layout
