@@ -6,9 +6,20 @@ import "../styles/global.css";
 type LayoutProps = {
   title?: string;
   description?: string;
+  ogType?: string;
+  ogImage?: string;
+  twitterImage?: string;
+  publishedTime?: string;
 };
 
-const { title, description } = Astro.props as LayoutProps;
+const {
+  title,
+  description,
+  ogType = "website",
+  ogImage,
+  twitterImage,
+  publishedTime,
+} = Astro.props as LayoutProps;
 
 const siteName = "r1go.dev";
 const siteUrl = "https://r1go.dev";
@@ -17,8 +28,8 @@ const fullTitle = title ? `${title} | ${siteName}` : defaultTitle;
 const metaDescription =
   description ??
   "Fullstack software engineer is my formal title. I build stuff that I need and if it good enough, I share it with everyone.";
-const ogImage = `${siteUrl}/og-image.png`;
-const twitterImage = `${siteUrl}/og-image.png`;
+const resolvedOgImage = ogImage ?? `${siteUrl}/og-image.png`;
+const resolvedTwitterImage = twitterImage ?? resolvedOgImage;
 ---
 
 <!doctype html>
@@ -40,9 +51,9 @@ const twitterImage = `${siteUrl}/og-image.png`;
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={metaDescription} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={Astro.url.toString()} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={resolvedOgImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={fullTitle} />
@@ -50,8 +61,13 @@ const twitterImage = `${siteUrl}/og-image.png`;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={metaDescription} />
-    <meta name="twitter:image" content={twitterImage} />
+    <meta name="twitter:image" content={resolvedTwitterImage} />
     <meta name="twitter:image:alt" content={fullTitle} />
+    {publishedTime && (
+      <meta property="article:published_time" content={publishedTime} />
+    )}
+
+    <slot name="head" />
 
     <script is:inline>
       // Prevent flash of wrong theme by setting it immediately

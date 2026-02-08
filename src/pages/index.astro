@@ -7,8 +7,10 @@ import PostCard from "../components/post-card.astro";
 import RevealList from "../components/reveal-list.astro";
 
 import { projects } from "../lib/projects";
-import { posts } from "../lib/posts";
+import { postSummaries } from "../lib/posts";
 import Hero from "../components/hero.astro";
+
+const posts = postSummaries.filter((post) => !post.isArchived);
 ---
 
 <Layout>
@@ -34,11 +36,11 @@ import Hero from "../components/hero.astro";
           target="_blank"
           class="underline decoration-muted-foreground/50 underline-offset-2 hover:decoration-foreground transition-colors"
           >Caban Energy</a
-        > working with React, Next.js, and TypeScript.
+        > working as a Frontend Engineer with React, Next.js, and TypeScript.
       </p>
     </section>
 
-    <!-- Connect Section -->
+    <!-- Connect Section --> 
     <section class="pt-2">
       <SocialLinks />
     </section>

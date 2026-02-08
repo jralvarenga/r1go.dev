@@ -3,16 +3,22 @@ type HeroProps = {
   title: string;
   description: string;
   goBack?: boolean;
+  backHref?: string;
 };
 
-const { title, description, goBack = false } = Astro.props as HeroProps;
+const {
+  title,
+  description,
+  goBack = false,
+  backHref = "..",
+} = Astro.props as HeroProps;
 ---
 
 <div class="space-y-3">
   {
     goBack && (
       <a
-        href=".."
+        href={backHref}
         class="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
       >
         <svg
