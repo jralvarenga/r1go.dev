@@ -23,7 +23,7 @@ const isCompact = variant === "compact";
   ]}
 >
   <img
-    src={getFaviconUrl(project.href)}
+    src={project.iconUrl ?? getFaviconUrl(project.href)}
     alt={`${project.title} icon`}
     width="16"
     height="16"

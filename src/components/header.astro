@@ -9,7 +9,15 @@ import logo from "../assets/profile-pic.jpeg";
   <nav class="mx-auto max-w-2xl px-6 py-4 pb-2 sm:py-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <Image src={logo} alt="r1go.dev" class="w-8 h-8 rounded-full" />
+        <Image
+          src={logo}
+          alt="r1go.dev"
+          width={32}
+          height={32}
+          format="webp"
+          quality={80}
+          class="w-8 h-8 rounded-full"
+        />
         <a
           href="/"
           class="text-lg font-semibold hover:text-accent transition-colors"
@@ -63,23 +71,6 @@ import logo from "../assets/profile-pic.jpeg";
 </header>
 
 <script>
-  // Initialize theme on page load
-  function initTheme() {
-    const theme =
-      localStorage.getItem("theme") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light");
-
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    updateThemeIcon(theme);
-  }
-
   // Update theme icon based on current theme
   function updateThemeIcon(theme: string) {
     const moonIcon = document.getElementById("theme-icon-moon");
@@ -109,12 +100,13 @@ import logo from "../assets/profile-pic.jpeg";
     updateThemeIcon(newTheme);
   }
 
-  // Initialize theme immediately to prevent flash
-  initTheme();
-
   // Set up toggle button
   document.addEventListener("DOMContentLoaded", () => {
     const toggleButton = document.getElementById("theme-toggle");
+    const currentTheme = document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
+    updateThemeIcon(currentTheme);
     if (toggleButton) {
       toggleButton.addEventListener("click", toggleTheme);
     }
