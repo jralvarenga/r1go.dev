@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/hero.astro";
 import { allPosts, type PostEntry } from "../../lib/posts";
+import { site } from "../../lib/site";
 
 export function getStaticPaths() {
   return allPosts.map((post) => ({
@@ -14,6 +15,31 @@ const { post } = Astro.props as { post: PostEntry };
 const publishedTime = post.dateISO.includes("T")
   ? post.dateISO
   : `${post.dateISO}T00:00:00Z`;
+const postUrl = new URL(post.href, site.siteUrl).toString();
+const resolvedOgImage = `${site.siteUrl}/og-image.png`;
+const blogPostingJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.description,
+  datePublished: publishedTime,
+  dateModified: publishedTime,
+  author: {
+    "@type": "Person",
+    name: site.author,
+    url: site.siteUrl,
+  },
+  publisher: {
+    "@type": "Person",
+    name: site.author,
+    url: site.siteUrl,
+  },
+  image: resolvedOgImage,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": postUrl,
+  },
+};
 const { Content } = post;
 ---
 
@@ -23,6 +49,9 @@ const { Content } = post;
   ogType="article"
   publishedTime={publishedTime}
 >
+  <script type="application/ld+json" slot="head">
+    {JSON.stringify(blogPostingJsonLd)}
+  </script>
   <article class="space-y-6">
     <Hero
       title={post.title}
@@ -31,7 +60,7 @@ const { Content } = post;
       backHref="/blog"
     />
     <div class="text-xs text-muted-foreground flex flex-wrap items-center gap-2">
-      <span>{post.date}</span>
+      <time datetime={publishedTime}>{post.date}</time>
       {
         post.links?.map((link) => (
           <a

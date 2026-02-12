@@ -9,9 +9,11 @@ const { title, href, linkText = "View all" } = Astro.props;
 ---
 
 <div class="flex items-center justify-between">
-  <h2 class="text-xs font-medium text-muted-foreground uppercase">
-    {title}
-  </h2>
+  {title && (
+    <h2 class="text-xs font-medium text-muted-foreground uppercase">
+      {title}
+    </h2>
+  )}
   {
     href && (
       <a
