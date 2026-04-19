@@ -1,9 +1,9 @@
 ---
-import type { Project } from "../types/projects";
+import type { LocalizedProject } from "../types/projects";
 import { getFaviconUrl } from "../lib/utils";
 
 type Props = {
-  project: Project;
+  project: LocalizedProject;
   variant?: "compact" | "full";
 };
 
@@ -48,7 +48,9 @@ const isCompact = variant === "compact";
                   {i > 0 && (
                     <span class="text-base text-muted-foreground/80">·</span>
                   )}
-                  <span class="text-[10px] text-muted-foreground/80">{tech}</span>
+                  <span class="text-[10px] text-muted-foreground/80">
+                    {tech}
+                  </span>
                 </>
               ))}
             </div>

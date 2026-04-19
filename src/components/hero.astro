@@ -1,5 +1,6 @@
 ---
 type HeroProps = {
+  backLabel?: string;
   title: string;
   description: string;
   goBack?: boolean;
@@ -7,6 +8,7 @@ type HeroProps = {
 };
 
 const {
+  backLabel = "Go back",
   title,
   description,
   goBack = false,
@@ -34,7 +36,7 @@ const {
             d="M9 5l7 7-7 7"
           />
         </svg>
-        Go back
+        {backLabel}
       </a>
     )
   }

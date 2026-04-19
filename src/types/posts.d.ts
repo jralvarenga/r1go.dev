@@ -1,7 +1,15 @@
+export type PostLink = {
+  label: string;
+  url: string;
+};
+
 export type Post = {
+  slug: string;
   title: string;
   description: string;
   date: string;
+  dateISO: string;
   href: string;
-  links?: { label: string; url: string }[];
+  isArchived: boolean;
+  links?: PostLink[];
 };

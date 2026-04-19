@@ -1,0 +1,39 @@
+---
+import Hero from "../hero.astro";
+import Layout from "../../layouts/Layout.astro";
+import ProjectCard from "../project-card.astro";
+import RevealList from "../reveal-list.astro";
+import { getLocalizedProjects } from "../../lib/i18n/data";
+import { getLocalizedPath } from "../../lib/i18n/routing";
+import { getLocale, getTranslations } from "../../lib/i18n/server";
+
+const locale = await getLocale();
+const t = await getTranslations();
+const projects = getLocalizedProjects(t);
+---
+
+<Layout
+  locale={locale}
+  title={t("projectsPage.metaTitle")}
+  description={t("projectsPage.metaDescription")}
+>
+  <section class="space-y-8">
+    <Hero
+      title={t("projectsPage.heroTitle")}
+      description={t("projectsPage.heroDescription")}
+      goBack={true}
+      backHref={getLocalizedPath(locale, "/")}
+      backLabel={t("hero.goBack")}
+    />
+
+    <RevealList class="space-y-3">
+      {
+        projects.map((project, idx) => (
+          <li class="reveal" style={`--delay: ${idx * 70}ms`}>
+            <ProjectCard project={project} variant="full" />
+          </li>
+        ))
+      }
+    </RevealList>
+  </section>
+</Layout>

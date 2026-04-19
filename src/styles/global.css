@@ -60,6 +60,15 @@
   }
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(root) {
+  animation: none;
+}
+
 .post-content {
   @apply text-sm leading-relaxed text-foreground;
 }

@@ -1,79 +1,120 @@
-import type { MarkdownInstance } from "astro";
-import type { Post } from "../types/posts";
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
-type Frontmatter = {
+import { postsCollection } from "./i18n/content";
+import { getLocalizedPath } from "./i18n/routing";
+import type { AppLocale } from "./i18n/request";
+
+export type PostEntry = CollectionEntry<"posts">;
+export type PostLink = NonNullable<PostEntry["data"]["links"]>[number];
+
+export type PostSummary = {
+  slug: string;
   title: string;
   description: string;
   date: string;
-  links?: { label: string; url: string }[];
-};
-
-export type PostSummary = Post & {
-  slug: string;
   dateISO: string;
+  href: string;
   isArchived: boolean;
-  links?: { label: string; url: string }[];
+  links?: PostLink[];
+  locale: AppLocale;
+  requestedLocale: AppLocale;
+  usedFallback: boolean;
 };
 
-export type PostEntry = PostSummary & {
-  Content: MarkdownInstance<Frontmatter>["Content"];
+export type PostDocument = PostSummary & {
+  Content: Awaited<
+    ReturnType<typeof postsCollection.renderDocument>
+  >["rendered"]["Content"];
 };
 
-const modules = import.meta.glob("../posts/**/*.md", { eager: true });
+const localeDateFormats: Record<AppLocale, string> = {
+  en: "en-US",
+  es: "es-ES",
+};
 
-const formatDate = (isoDate: string) => {
-  const normalized = isoDate.includes("T") ? isoDate : `${isoDate}T00:00:00Z`;
-  const date = new Date(normalized);
+export async function getPostDocumentIds() {
+  const entries = await getCollection("posts");
+
+  return entries
+    .filter((entry) => entry.id.startsWith("en/"))
+    .map((entry) => entry.id.slice(3))
+    .sort((a, b) => {
+      const entryA = entries.find((entry) => entry.id === `en/${a}`);
+      const entryB = entries.find((entry) => entry.id === `en/${b}`);
+
+      return (
+        new Date(entryB?.data.date ?? 0).getTime() -
+        new Date(entryA?.data.date ?? 0).getTime()
+      );
+    });
+}
+
+export async function getPostSummaries(locale: AppLocale) {
+  const documentIds = await getPostDocumentIds();
+
+  const summaries = await Promise.all(
+    documentIds.map(async (documentId) => {
+      const document = await postsCollection.getDocument(documentId, {
+        locale,
+      });
+
+      return {
+        slug: document.id,
+        title: document.data.title,
+        description: document.data.description,
+        date: formatDate(document.data.date, locale),
+        dateISO: document.data.date,
+        href: getLocalizedPath(locale, `/blog/${document.id}`),
+        isArchived: isArchivedPost(document.id),
+        links: document.data.links,
+        locale: document.locale,
+        requestedLocale: document.requestedLocale,
+        usedFallback: document.usedFallback,
+      } satisfies PostSummary;
+    }),
+  );
+
+  return summaries;
+}
+
+export async function getPostBySlug(slug: string, locale: AppLocale) {
+  const document = await postsCollection.renderDocument(slug, { locale });
+
+  return {
+    slug: document.id,
+    title: document.data.title,
+    description: document.data.description,
+    date: formatDate(document.data.date, locale),
+    dateISO: document.data.date,
+    href: getLocalizedPath(locale, `/blog/${document.id}`),
+    isArchived: isArchivedPost(document.id),
+    links: document.data.links,
+    locale: document.locale,
+    requestedLocale: document.requestedLocale,
+    usedFallback: document.usedFallback,
+    Content: document.rendered.Content,
+  } satisfies PostDocument;
+}
+
+function formatDate(isoDate: string, locale: AppLocale) {
+  const normalizedDate = isoDate.includes("T")
+    ? isoDate
+    : `${isoDate}T00:00:00Z`;
+  const date = new Date(normalizedDate);
 
   if (Number.isNaN(date.getTime())) {
     throw new Error(`Invalid post date: ${isoDate}`);
   }
 
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(localeDateFormats[locale], {
     year: "numeric",
     month: "short",
     day: "numeric",
     timeZone: "UTC",
   }).format(date);
-};
+}
 
-const normalizeSlug = (path: string) =>
-  path.replace("../posts/", "").replace(/\.md$/, "");
-
-const allPosts: PostEntry[] = Object.entries(modules)
-  .map(([path, mod]) => {
-    const { frontmatter, Content } = mod as MarkdownInstance<Frontmatter>;
-
-    if (!frontmatter?.title || !frontmatter?.description || !frontmatter?.date) {
-      throw new Error(`Missing frontmatter in ${path}`);
-    }
-
-    const slug = normalizeSlug(path);
-    const dateISO = frontmatter.date;
-
-    const links = Array.isArray(frontmatter.links)
-      ? frontmatter.links.filter(
-          (link) => Boolean(link?.label) && Boolean(link?.url),
-        )
-      : undefined;
-
-    return {
-      title: frontmatter.title,
-      description: frontmatter.description,
-      date: formatDate(dateISO),
-      dateISO,
-      href: `/blog/${slug}`,
-      slug,
-      isArchived: slug === "archive" || slug.startsWith("archive/"),
-      links,
-      Content,
-    };
-  })
-  .sort(
-    (a, b) =>
-      new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime(),
-  );
-
-const postSummaries: PostSummary[] = allPosts.map(({ Content, ...summary }) => summary);
-
-export { allPosts, postSummaries };
+function isArchivedPost(slug: string) {
+  return slug === "archive" || slug.startsWith("archive/");
+}
