@@ -11,7 +11,6 @@ type Props = {
 };
 
 const { post } = Astro.props as Props;
-const { Content } = post;
 const locale = await getLocale();
 const t = await getTranslations();
 const publishedTime = post.dateISO.includes("T")
@@ -90,8 +89,6 @@ const blogPostingJsonLd = {
         ))
       }
     </div>
-    <div class="post-content">
-      <Content />
-    </div>
+    <div class="post-content" set:html={post.html} />
   </article>
 </Layout>

@@ -1,19 +1,57 @@
 ---
+import { MarkdownDocumentNotFoundError } from "@better-translate/md";
 import BlogPostPage from "../../components/pages/BlogPostPage.astro";
-import { getPostBySlug, getPostDocumentIds } from "../../lib/posts";
+import NotFoundPage from "../../components/pages/NotFoundPage.astro";
+import { getPostBySlug } from "../../lib/posts";
 import { getLocale } from "../../lib/i18n/server";
-
-export async function getStaticPaths() {
-  const slugs = await getPostDocumentIds();
-
-  return slugs.map((slug) => ({
-    params: { slug },
-  }));
-}
 
 const locale = await getLocale();
 const slug = Astro.params.slug ?? "";
-const post = await getPostBySlug(slug, locale);
+const normalizedSlug =
+  slug
+    .split("/")
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+    .at(-1) ?? "";
+let post:
+  | Awaited<ReturnType<typeof getPostBySlug>>
+  | undefined;
+let notFound = false;
+
+if (!slug) {
+  Astro.response.status = 404;
+  notFound = true;
+} else if (normalizedSlug !== slug) {
+  try {
+    await getPostBySlug(normalizedSlug, locale);
+
+    return Astro.redirect(`/blog/${normalizedSlug}`, 301);
+  } catch (error) {
+    if (error instanceof MarkdownDocumentNotFoundError) {
+      Astro.response.status = 404;
+      notFound = true;
+    } else {
+      throw error;
+    }
+  }
+} else {
+  try {
+    post = await getPostBySlug(slug, locale);
+  } catch (error) {
+    if (error instanceof MarkdownDocumentNotFoundError) {
+      Astro.response.status = 404;
+      notFound = true;
+    } else {
+      throw error;
+    }
+  }
+}
 ---
 
-<BlogPostPage post={post} />
+{
+  notFound || !post ? (
+    <NotFoundPage locale={locale} />
+  ) : (
+    <BlogPostPage post={post} />
+  )
+}

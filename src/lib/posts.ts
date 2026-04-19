@@ -1,12 +1,11 @@
-import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
-
-import { postsCollection } from "./i18n/content";
+import { defaultLocale, type AppLocale } from "./i18n/request";
+import { postsMarkdown } from "./i18n/markdown";
 import { getLocalizedPath } from "./i18n/routing";
-import type { AppLocale } from "./i18n/request";
-
-export type PostEntry = CollectionEntry<"posts">;
-export type PostLink = NonNullable<PostEntry["data"]["links"]>[number];
+import {
+  parsePostFrontmatter,
+  type PostFrontmatter,
+  type PostLink,
+} from "./posts-schema";
 
 export type PostSummary = {
   slug: string;
@@ -23,9 +22,7 @@ export type PostSummary = {
 };
 
 export type PostDocument = PostSummary & {
-  Content: Awaited<
-    ReturnType<typeof postsCollection.renderDocument>
-  >["rendered"]["Content"];
+  html: string;
 };
 
 const localeDateFormats: Record<AppLocale, string> = {
@@ -34,20 +31,29 @@ const localeDateFormats: Record<AppLocale, string> = {
 };
 
 export async function getPostDocumentIds() {
-  const entries = await getCollection("posts");
+  const collection = await postsMarkdown.getCollection();
+  const documentIds = await collection.listDocuments();
+  const datedDocuments = await Promise.all(
+    documentIds.map(async (documentId) => {
+      const document = await collection.getDocument(documentId, {
+        locale: defaultLocale,
+      });
 
-  return entries
-    .filter((entry) => entry.id.startsWith("en/"))
-    .map((entry) => entry.id.slice(3))
+      return {
+        id: documentId,
+        frontmatter: parsePostFrontmatter(document.frontmatter),
+      };
+    }),
+  );
+
+  return datedDocuments
     .sort((a, b) => {
-      const entryA = entries.find((entry) => entry.id === `en/${a}`);
-      const entryB = entries.find((entry) => entry.id === `en/${b}`);
-
       return (
-        new Date(entryB?.data.date ?? 0).getTime() -
-        new Date(entryA?.data.date ?? 0).getTime()
+        new Date(b.frontmatter.date).getTime() -
+        new Date(a.frontmatter.date).getTime()
       );
-    });
+    })
+    .map((document) => document.id);
 }
 
 export async function getPostSummaries(locale: AppLocale) {
@@ -55,23 +61,10 @@ export async function getPostSummaries(locale: AppLocale) {
 
   const summaries = await Promise.all(
     documentIds.map(async (documentId) => {
-      const document = await postsCollection.getDocument(documentId, {
-        locale,
-      });
+      const document = await postsMarkdown.getDocument(documentId, { locale });
+      const frontmatter = parsePostFrontmatter(document.frontmatter);
 
-      return {
-        slug: document.id,
-        title: document.data.title,
-        description: document.data.description,
-        date: formatDate(document.data.date, locale),
-        dateISO: document.data.date,
-        href: getLocalizedPath(locale, `/blog/${document.id}`),
-        isArchived: isArchivedPost(document.id),
-        links: document.data.links,
-        locale: document.locale,
-        requestedLocale: document.requestedLocale,
-        usedFallback: document.usedFallback,
-      } satisfies PostSummary;
+      return createPostSummary(document, frontmatter, locale);
     }),
   );
 
@@ -79,22 +72,42 @@ export async function getPostSummaries(locale: AppLocale) {
 }
 
 export async function getPostBySlug(slug: string, locale: AppLocale) {
-  const document = await postsCollection.renderDocument(slug, { locale });
+  const document = await postsMarkdown.compileDocument(slug, { locale });
+  const frontmatter = parsePostFrontmatter(document.frontmatter);
+
+  if (document.kind !== "md") {
+    throw new Error(`Unsupported post format for "${slug}": ${document.kind}`);
+  }
 
   return {
+    ...createPostSummary(document, frontmatter, locale),
+    html: document.html,
+  } satisfies PostDocument;
+}
+
+function createPostSummary(
+  document: {
+    id: string;
+    locale: AppLocale;
+    requestedLocale: AppLocale;
+    usedFallback: boolean;
+  },
+  frontmatter: PostFrontmatter,
+  locale: AppLocale,
+) {
+  return {
     slug: document.id,
-    title: document.data.title,
-    description: document.data.description,
-    date: formatDate(document.data.date, locale),
-    dateISO: document.data.date,
+    title: frontmatter.title,
+    description: frontmatter.description,
+    date: formatDate(frontmatter.date, locale),
+    dateISO: frontmatter.date,
     href: getLocalizedPath(locale, `/blog/${document.id}`),
     isArchived: isArchivedPost(document.id),
-    links: document.data.links,
+    links: frontmatter.links,
     locale: document.locale,
     requestedLocale: document.requestedLocale,
     usedFallback: document.usedFallback,
-    Content: document.rendered.Content,
-  } satisfies PostDocument;
+  } satisfies PostSummary;
 }
 
 function formatDate(isoDate: string, locale: AppLocale) {

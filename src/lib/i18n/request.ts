@@ -27,10 +27,14 @@ export function getLocaleFromCookieHeader(cookieHeader?: string | null) {
       continue;
     }
 
-    const locale = decodeURIComponent(rawValue.join("="));
+    try {
+      const locale = decodeURIComponent(rawValue.join("="));
 
-    if (isAppLocale(locale)) {
-      return locale;
+      if (isAppLocale(locale)) {
+        return locale;
+      }
+    } catch {
+      continue;
     }
   }
 

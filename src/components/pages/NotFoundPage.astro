@@ -1,0 +1,44 @@
+---
+import Hero from "../hero.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getLocalizedPath } from "../../lib/i18n/routing";
+import type { AppLocale } from "../../lib/i18n/request";
+
+type Props = {
+  locale: AppLocale;
+};
+
+const { locale } = Astro.props as Props;
+
+const copy = {
+  en: {
+    title: "Page not found",
+    description: "The page you're looking for doesn't exist or is no longer available.",
+    homeLabel: "Go home",
+  },
+  es: {
+    title: "Pagina no encontrada",
+    description:
+      "La pagina que buscas no existe o ya no esta disponible.",
+    homeLabel: "Ir al inicio",
+  },
+} as const;
+
+const content = copy[locale] ?? copy.en;
+---
+
+<Layout
+  locale={locale}
+  title={content.title}
+  description={content.description}
+>
+  <section class="space-y-8">
+    <Hero
+      title={content.title}
+      description={content.description}
+      goBack={true}
+      backHref={getLocalizedPath(locale, "/")}
+      backLabel={content.homeLabel}
+    />
+  </section>
+</Layout>
