@@ -1,5 +1,9 @@
 ---
+type Props = {
+  text: string;
+};
 
+const { text } = Astro.props as Props;
 ---
 
 <footer
@@ -7,7 +11,7 @@
 >
   <div class="backdrop-blur-lg bg-background/50 px-3 py-1 rounded-full">
     <p class="text-muted-foreground">
-      all rights reserved &copy; 2026 Jorge Alvarenga
+      {text}
     </p>
   </div>
 </footer>

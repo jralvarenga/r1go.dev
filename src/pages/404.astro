@@ -1,0 +1,8 @@
+---
+import NotFoundPage from "../components/pages/NotFoundPage.astro";
+import { getLocale } from "../lib/i18n/server";
+
+const locale = await getLocale();
+---
+
+<NotFoundPage locale={locale} />

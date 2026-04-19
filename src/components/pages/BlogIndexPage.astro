@@ -1,0 +1,45 @@
+---
+import Hero from "../hero.astro";
+import Layout from "../../layouts/Layout.astro";
+import PostCard from "../post-card.astro";
+import RevealList from "../reveal-list.astro";
+import { getPostSummaries } from "../../lib/posts";
+import { getLocalizedPath } from "../../lib/i18n/routing";
+import { getLocale, getTranslations } from "../../lib/i18n/server";
+
+const locale = await getLocale();
+const t = await getTranslations();
+const posts = (await getPostSummaries(locale)).filter(
+  (post) => !post.isArchived,
+);
+---
+
+<Layout
+  locale={locale}
+  title={t("blog.metaTitle")}
+  description={t("blog.metaDescription")}
+>
+  <section class="space-y-8">
+    <Hero
+      title={t("blog.heroTitle")}
+      description={t("blog.heroDescription")}
+      goBack={true}
+      backHref={getLocalizedPath(locale, "/")}
+      backLabel={t("hero.goBack")}
+    />
+
+    {
+      posts.length > 0 ? (
+        <RevealList>
+          {posts.map((post, idx) => (
+            <li class="reveal" style={`--delay: ${idx * 70}ms`}>
+              <PostCard post={post} variant="compact" />
+            </li>
+          ))}
+        </RevealList>
+      ) : (
+        <p class="text-muted-foreground">{t("blog.emptyState")}</p>
+      )
+    }
+  </section>
+</Layout>

@@ -1,89 +1,57 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import Hero from "../../components/hero.astro";
-import { allPosts, type PostEntry } from "../../lib/posts";
-import { site } from "../../lib/site";
+import { MarkdownDocumentNotFoundError } from "@better-translate/md";
+import BlogPostPage from "../../components/pages/BlogPostPage.astro";
+import NotFoundPage from "../../components/pages/NotFoundPage.astro";
+import { getPostBySlug } from "../../lib/posts";
+import { getLocale } from "../../lib/i18n/server";
 
-export function getStaticPaths() {
-  return allPosts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+const locale = await getLocale();
+const slug = Astro.params.slug ?? "";
+const normalizedSlug =
+  slug
+    .split("/")
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+    .at(-1) ?? "";
+let post:
+  | Awaited<ReturnType<typeof getPostBySlug>>
+  | undefined;
+let notFound = false;
+
+if (!slug) {
+  Astro.response.status = 404;
+  notFound = true;
+} else if (normalizedSlug !== slug) {
+  try {
+    await getPostBySlug(normalizedSlug, locale);
+
+    return Astro.redirect(`/blog/${normalizedSlug}`, 301);
+  } catch (error) {
+    if (error instanceof MarkdownDocumentNotFoundError) {
+      Astro.response.status = 404;
+      notFound = true;
+    } else {
+      throw error;
+    }
+  }
+} else {
+  try {
+    post = await getPostBySlug(slug, locale);
+  } catch (error) {
+    if (error instanceof MarkdownDocumentNotFoundError) {
+      Astro.response.status = 404;
+      notFound = true;
+    } else {
+      throw error;
+    }
+  }
 }
-
-const { post } = Astro.props as { post: PostEntry };
-const publishedTime = post.dateISO.includes("T")
-  ? post.dateISO
-  : `${post.dateISO}T00:00:00Z`;
-const postUrl = new URL(post.href, site.siteUrl).toString();
-const resolvedOgImage = `${site.siteUrl}/og-image.png`;
-const blogPostingJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: post.title,
-  description: post.description,
-  datePublished: publishedTime,
-  dateModified: publishedTime,
-  author: {
-    "@type": "Person",
-    name: site.author,
-    url: site.siteUrl,
-  },
-  publisher: {
-    "@type": "Person",
-    name: site.author,
-    url: site.siteUrl,
-  },
-  image: resolvedOgImage,
-  mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": postUrl,
-  },
-};
-const { Content } = post;
 ---
 
-<Layout
-  title={post.title}
-  description={post.description}
-  ogType="article"
-  publishedTime={publishedTime}
->
-  <script type="application/ld+json" slot="head">
-    {JSON.stringify(blogPostingJsonLd)}
-  </script>
-  <article class="space-y-6">
-    <Hero
-      title={post.title}
-      description={post.description}
-      goBack={true}
-      backHref="/blog"
-    />
-    <div class="text-xs text-muted-foreground flex flex-wrap items-center gap-2">
-      <time datetime={publishedTime}>{post.date}</time>
-      {
-        post.links?.map((link) => (
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-[11px] px-2.5 py-1 flex items-center gap-1 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
-          >
-            <svg
-              class="w-3 h-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            {link.label}
-          </a>
-        ))
-      }
-    </div>
-    <div class="post-content">
-      <Content />
-    </div>
-  </article>
-</Layout>
+{
+  notFound || !post ? (
+    <NotFoundPage locale={locale} />
+  ) : (
+    <BlogPostPage post={post} />
+  )
+}

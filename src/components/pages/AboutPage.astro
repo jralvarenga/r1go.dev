@@ -1,0 +1,65 @@
+---
+import Hero from "../hero.astro";
+import Layout from "../../layouts/Layout.astro";
+import SocialLinks from "../social-links.astro";
+import { getLocalizedPath } from "../../lib/i18n/routing";
+import { getLocale, getTranslations } from "../../lib/i18n/server";
+
+const locale = await getLocale();
+const t = await getTranslations();
+---
+
+<Layout
+  locale={locale}
+  title={t("about.metaTitle")}
+  description={t("about.metaDescription")}
+>
+  <section class="w-full max-w-2xl text-center space-y-8 text-left">
+    <Hero
+      title={t("about.heroTitle")}
+      description={t("about.heroDescription")}
+      goBack={true}
+      backHref={getLocalizedPath(locale, "/")}
+      backLabel={t("hero.goBack")}
+    />
+
+    <div class="space-y-6 text-left">
+      <p class="text-base leading-relaxed text-foreground">
+        {t("about.paragraphOne")}
+      </p>
+
+      <p class="text-base leading-relaxed text-foreground">
+        {t("about.paragraphTwoPrefix")}{" "}
+        <a
+          href="https://www.cabanenergy.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-accent underline transition-colors"
+        >
+          Caban Energy
+        </a>{" "}
+        {t("about.paragraphTwoSuffix")}
+      </p>
+
+      <p class="text-base leading-relaxed text-foreground">
+        {t("about.paragraphThreePrefix")}{" "}
+        <a
+          href={getLocalizedPath(locale, "/projects")}
+          class="text-accent underline transition-colors"
+        >
+          {t("about.paragraphThreeMiddle")}
+        </a>
+        {t("about.paragraphThreeConnector")}{" "}
+        <a
+          href={getLocalizedPath(locale, "/blog")}
+          class="text-accent underline transition-colors"
+        >
+          {t("about.paragraphThreeBlog")}
+        </a>{" "}
+        {t("about.paragraphThreeSuffix")}
+      </p>
+
+      <SocialLinks emailLabel={t("social.email")} />
+    </div>
+  </section>
+</Layout>

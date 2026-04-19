@@ -1,17 +1,51 @@
 ---
 import { Image } from "astro:assets";
 import logo from "../assets/profile-pic.jpeg";
+
+type NavItem = {
+  href: string;
+  label: string;
+};
+
+type LocaleSwitchItem = {
+  locale: string;
+  isCurrent: boolean;
+  label: string;
+  nativeLabel: string;
+};
+
+type Props = {
+  homeHref: string;
+  homeLabel: string;
+  localeCookieMaxAge: number;
+  localeCookieName: string;
+  languageSwitcherLabel: string;
+  localeSwitchItems: LocaleSwitchItem[];
+  navItems: NavItem[];
+  themeToggleLabel: string;
+};
+
+const {
+  homeHref,
+  homeLabel,
+  localeCookieMaxAge,
+  localeCookieName,
+  languageSwitcherLabel,
+  localeSwitchItems,
+  navItems,
+  themeToggleLabel,
+} = Astro.props as Props;
 ---
 
 <header
   class="rounded-b-xl backdrop-blur-lg bg-background/50 fixed top-0 left-0 right-0 z-50"
 >
-  <nav class="mx-auto max-w-2xl px-6 py-4 pb-2 sm:py-6">
-    <div class="flex items-center justify-between">
+  <nav class="mx-auto max-w-2xl px-6 py-4 pb-3 sm:py-6 sm:pb-2">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-3">
         <Image
           src={logo}
-          alt="r1go.dev"
+          alt={homeLabel}
           width={32}
           height={32}
           format="webp"
@@ -19,29 +53,54 @@ import logo from "../assets/profile-pic.jpeg";
           class="w-8 h-8 rounded-full"
         />
         <a
-          href="/"
+          href={homeHref}
           class="text-lg font-semibold hover:text-accent transition-colors"
         >
-          r1go.dev
+          {homeLabel}
         </a>
       </div>
-      <div class="flex gap-6 items-center text-sm">
-        <a
-          href="/projects"
-          class="text-muted-foreground hover:text-foreground transition-colors"
+      <div class="flex flex-wrap items-center gap-3 text-sm sm:justify-end sm:gap-6">
+        <div class="flex items-center gap-4">
+          {
+            navItems.map((item) => (
+              <a
+                href={item.href}
+                class="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+        <div
+          class="flex shrink-0 items-center rounded-full border border-border/50 bg-muted/40 p-0.5 shadow-sm backdrop-blur-sm"
+          aria-label={languageSwitcherLabel}
         >
-          Projects
-        </a>
-        <a
-          href="/blog"
-          class="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Blog
-        </a>
+          {
+            localeSwitchItems.map((item) => (
+              <button
+                type="button"
+                data-language-switcher-button
+                data-locale={item.locale}
+                class:list={[
+                  "rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider transition-all duration-200 ease-out disabled:cursor-default",
+                  item.isCurrent
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:bg-background/60 hover:text-foreground",
+                ]}
+                aria-pressed={item.isCurrent ? "true" : "false"}
+                disabled={item.isCurrent}
+                title={item.nativeLabel}
+              >
+                {item.label}
+              </button>
+            ))
+          }
+        </div>
         <button
           id="theme-toggle"
-          class="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-          aria-label="Toggle theme"
+          class="shrink-0 p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          aria-label={themeToggleLabel}
         >
           <svg
             id="theme-icon-moon"
@@ -70,45 +129,158 @@ import logo from "../assets/profile-pic.jpeg";
   </nav>
 </header>
 
-<script>
-  // Update theme icon based on current theme
-  function updateThemeIcon(theme: string) {
-    const moonIcon = document.getElementById("theme-icon-moon");
-    const sunIcon = document.getElementById("theme-icon-sun");
+<script define:vars={{ localeCookieMaxAge, localeCookieName }}>
+  (() => {
+    const win = window;
+    const reduceMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
 
-    if (theme === "dark") {
-      if (moonIcon) moonIcon.classList.add("hidden");
-      if (sunIcon) sunIcon.classList.remove("hidden");
-    } else {
-      if (sunIcon) sunIcon.classList.add("hidden");
-      if (moonIcon) moonIcon.classList.remove("hidden");
-    }
-  }
+    function updateThemeIcon(theme) {
+      const moonIcon = document.getElementById("theme-icon-moon");
+      const sunIcon = document.getElementById("theme-icon-sun");
 
-  // Toggle theme
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.contains("dark");
-    const newTheme = isDark ? "light" : "dark";
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+      if (theme === "dark") {
+        if (moonIcon) moonIcon.classList.add("hidden");
+        if (sunIcon) sunIcon.classList.remove("hidden");
+      } else {
+        if (sunIcon) sunIcon.classList.add("hidden");
+        if (moonIcon) moonIcon.classList.remove("hidden");
+      }
     }
 
-    localStorage.setItem("theme", newTheme);
-    updateThemeIcon(newTheme);
-  }
+    function animateThemeToggle(theme, toggleButton) {
+      if (
+        !document.startViewTransition ||
+        reduceMotionQuery.matches ||
+        win.__r1goThemeTransitionRunning
+      ) {
+        win.__r1goApplyTheme?.(theme);
+        updateThemeIcon(theme);
+        return;
+      }
 
-  // Set up toggle button
-  document.addEventListener("DOMContentLoaded", () => {
-    const toggleButton = document.getElementById("theme-toggle");
-    const currentTheme = document.documentElement.classList.contains("dark")
-      ? "dark"
-      : "light";
-    updateThemeIcon(currentTheme);
-    if (toggleButton) {
-      toggleButton.addEventListener("click", toggleTheme);
+      const { left, top, width, height } = toggleButton.getBoundingClientRect();
+      const x = left + width / 2;
+      const y = top + height / 2;
+      const maxRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y),
+      );
+      const isDarkTheme = theme === "dark";
+
+      win.__r1goThemeTransitionRunning = true;
+
+      const transition = document.startViewTransition(() => {
+        win.__r1goApplyTheme?.(theme);
+        updateThemeIcon(theme);
+      });
+
+      transition.ready
+        .then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: isDarkTheme
+                ? [
+                    `circle(0px at ${x}px ${y}px)`,
+                    `circle(${maxRadius}px at ${x}px ${y}px)`,
+                  ]
+                : [
+                    `circle(${maxRadius}px at ${x}px ${y}px)`,
+                    `circle(0px at ${x}px ${y}px)`,
+                  ],
+            },
+            {
+              duration: 550,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              pseudoElement: `::view-transition-${isDarkTheme ? "new" : "old"}(root)`,
+            },
+          );
+        })
+        .catch(() => {
+          win.__r1goApplyTheme?.(theme);
+          updateThemeIcon(theme);
+        })
+        .finally(() => {
+          transition.finished.finally(() => {
+            win.__r1goThemeTransitionRunning = false;
+          });
+        });
     }
-  });
+
+    function toggleTheme(event) {
+      const isDark = document.documentElement.classList.contains("dark");
+      const newTheme = isDark ? "light" : "dark";
+      const toggleButton =
+        event?.currentTarget instanceof HTMLButtonElement
+          ? event.currentTarget
+          : document.getElementById("theme-toggle");
+
+      localStorage.setItem("theme", newTheme);
+
+      if (toggleButton instanceof HTMLButtonElement) {
+        animateThemeToggle(newTheme, toggleButton);
+        return;
+      }
+
+      win.__r1goApplyTheme?.(newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function initThemeToggle() {
+      const toggleButton = document.getElementById("theme-toggle");
+      const currentTheme = win.__r1goGetTheme?.() ?? "light";
+
+      win.__r1goApplyTheme?.(currentTheme);
+      updateThemeIcon(currentTheme);
+
+      if (toggleButton instanceof HTMLButtonElement) {
+        toggleButton.onclick = toggleTheme;
+      }
+    }
+
+    function updateLocale(locale) {
+      try {
+        sessionStorage.setItem("r1go_skip_reveal", "1");
+      } catch {}
+
+      document.cookie = `${localeCookieName}=${encodeURIComponent(locale)}; path=/; max-age=${localeCookieMaxAge}; samesite=lax`;
+      window.location.reload();
+    }
+
+    function initLanguageSwitcher() {
+      const buttons = document.querySelectorAll(
+        "[data-language-switcher-button]",
+      );
+
+      buttons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement) || button.disabled) {
+          return;
+        }
+
+        button.onclick = () => {
+          const locale = button.dataset.locale;
+
+          if (!locale) {
+            return;
+          }
+
+          updateLocale(locale);
+        };
+      });
+    }
+
+    if (!win.__r1goThemeToggleSetup) {
+      win.__r1goThemeToggleSetup = true;
+      document.addEventListener("astro:page-load", initThemeToggle);
+    }
+
+    if (!win.__r1goLanguageSwitcherSetup) {
+      win.__r1goLanguageSwitcherSetup = true;
+      document.addEventListener("astro:page-load", initLanguageSwitcher);
+    }
+
+    initThemeToggle();
+    initLanguageSwitcher();
+  })();
 </script>

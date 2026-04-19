@@ -1,0 +1,93 @@
+---
+import Hero from "../hero.astro";
+import Layout from "../../layouts/Layout.astro";
+import PostCard from "../post-card.astro";
+import ProjectCard from "../project-card.astro";
+import RevealList from "../reveal-list.astro";
+import SectionHeader from "../section-header.astro";
+import SocialLinks from "../social-links.astro";
+import { getPostSummaries } from "../../lib/posts";
+import { getLocalizedProjects } from "../../lib/i18n/data";
+import { getLocalizedPath } from "../../lib/i18n/routing";
+import { getLocale, getTranslations } from "../../lib/i18n/server";
+
+const locale = await getLocale();
+const t = await getTranslations();
+const projects = getLocalizedProjects(t);
+const posts = (await getPostSummaries(locale)).filter(
+  (post) => !post.isArchived,
+);
+---
+
+<Layout locale={locale}>
+  <div class="space-y-8">
+    <section class="space-y-4">
+      <Hero
+        title={t("home.heroTitle")}
+        description={t("home.heroDescription")}
+      />
+
+      <SectionHeader
+        title=""
+        href={getLocalizedPath(locale, "/about-me")}
+        linkText={t("actions.readMore")}
+      />
+      <p class="text-base leading-relaxed text-foreground">
+        {t("home.intro")}
+      </p>
+      <p>
+        {t("home.currentlyWorkingPrefix")}{" "}
+        <a
+          href="https://www.cabanenergy.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="underline decoration-muted-foreground/50 underline-offset-2 hover:decoration-foreground transition-colors"
+        >
+          Caban Energy
+        </a>{" "}
+        {t("home.currentlyWorkingSuffix")}
+      </p>
+    </section>
+
+    <section class="pt-2">
+      <SocialLinks emailLabel={t("social.email")} />
+    </section>
+
+    <section class="space-y-2">
+      <SectionHeader
+        title={t("sections.projects")}
+        href={getLocalizedPath(locale, "/projects")}
+        linkText={t("actions.checkMyProjects")}
+      />
+      <RevealList>
+        {
+          projects.slice(0, 2).map((project, idx) => (
+            <li class="reveal" style={`--delay: ${idx * 70}ms`}>
+              <ProjectCard project={project} variant="compact" />
+            </li>
+          ))
+        }
+      </RevealList>
+    </section>
+
+    <section class="space-y-2">
+      <SectionHeader
+        title={t("sections.posts")}
+        href={getLocalizedPath(locale, "/blog")}
+        linkText={t("actions.seeMyPosts")}
+      />
+      <RevealList>
+        {
+          posts.slice(0, 2).map((post, idx) => (
+            <li
+              class="reveal"
+              style={`--delay: ${(projects.length + idx) * 70}ms`}
+            >
+              <PostCard post={post} variant="compact" />
+            </li>
+          ))
+        }
+      </RevealList>
+    </section>
+  </div>
+</Layout>
